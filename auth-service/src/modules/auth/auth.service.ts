@@ -5,12 +5,12 @@ import { ClientKafka, RpcException } from '@nestjs/microservices';
 
 import * as bcrypt from 'bcryptjs';
 
-import { TokensResponse } from '@shared/dto/auth/token-response.dto';
+import { TokensResponse } from 'src/shared/dto/auth/token-response.dto';
 import { UserService } from '../user/user.service';
-import { User } from '@shared/schemas/user.schema';
-import { SignInRequest } from '@shared/dto/auth/sign-in.dto';
-import { SignUpRequest } from '@shared/dto/auth/sign-up.dto';
-import { CONSTANTS } from '@shared/constants';
+import { User } from 'src/shared/schemas/user.schema';
+import { SignInRequest } from 'src/shared/dto/auth/sign-in.dto';
+import { SignUpRequest } from 'src/shared/dto/auth/sign-up.dto';
+import { CONSTANTS } from 'src/shared/constants';
 
 @Injectable()
 export class AuthService {

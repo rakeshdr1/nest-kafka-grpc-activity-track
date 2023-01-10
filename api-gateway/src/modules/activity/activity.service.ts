@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
-import { CONSTANTS } from '@shared/constants';
-import { CreateActivityRequest } from '@shared/dto/activity/create-activity.dto';
-import { UpdateActivityRequest } from '@shared/dto/activity/update-activity.dto';
-import HttpCreatedResponse from '@shared/http/created-response';
-import HttpOkResponse from '@shared/http/ok-response';
+import { CONSTANTS } from 'src/shared/constants';
+import { CreateActivityRequest } from 'src/shared/dto/activity/create-activity.dto';
+import { UpdateActivityRequest } from 'src/shared/dto/activity/update-activity.dto';
+import HttpCreatedResponse from 'src/shared/http/created-response';
+import HttpOkResponse from 'src/shared/http/ok-response';
 
 @Injectable()
 export class ActivityService {

@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { HttpExceptionFilter } from '@shared/filters/http-exception.filter';
+import { HttpExceptionFilter } from 'src/shared/filters/http-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
