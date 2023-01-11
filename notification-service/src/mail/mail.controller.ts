@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
-import { CONSTANTS } from '@shared/constants';
-import { ParseMessagePipe } from '@shared/pipes/parse-message.pipe';
+import { CONSTANTS } from 'src/shared/constants';
+import { ParseMessagePipe } from 'src/shared/pipes/parse-message.pipe';
 import { MailService } from './mail.service';
 
 @Controller('mail')

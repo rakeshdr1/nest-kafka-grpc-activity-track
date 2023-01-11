@@ -25,6 +25,8 @@
     "start": "concurrently \"yarn api-gateway\" \"yarn auth-service\" \"yarn notification-service\" \"yarn activity-service\""
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.8.2",
+    "@grpc/proto-loader": "^0.7.4",
     "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.2.0",

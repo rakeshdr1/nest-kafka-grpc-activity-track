@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
+import { Client, ClientGrpc, ClientKafka } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
 import { CONSTANTS } from 'src/shared/constants';
@@ -7,23 +7,34 @@ import { CreateActivityRequest } from 'src/shared/dto/activity/create-activity.d
 import { UpdateActivityRequest } from 'src/shared/dto/activity/update-activity.dto';
 import HttpCreatedResponse from 'src/shared/http/created-response';
 import HttpOkResponse from 'src/shared/http/ok-response';
+import { IGrpcService } from './grpc.interface';
+import { microserviceOptions } from './grpc.options';
 
 @Injectable()
 export class ActivityService {
+  @Client(microserviceOptions)
+  private client: ClientGrpc;
+
+  private activityGrpcService: IGrpcService;
+
+  onModuleInit() {
+    this.activityGrpcService =
+      this.client.getService<IGrpcService>('ActivityController');
+  }
+
   constructor(
     @Inject('Activity-SERVICE')
     private readonly activityService: ClientKafka,
   ) {}
 
-  async findAllByUser(userId: string) {
-    const activities = await firstValueFrom(
-      this.activityService.send(
-        CONSTANTS.KAFKA_TOPICS.ACTIVITY.FIND_ALL,
-        userId,
-      ),
-    );
+  accumulate(data) {
+    return this.activityGrpcService.accumulate({ data });
+  }
 
-    return new HttpOkResponse(activities);
+  async findAllByUser(userId: string) {
+    return firstValueFrom(
+      this.activityGrpcService.findAllByUser({ id: userId }),
+    );
   }
 
   async create(data: CreateActivityRequest) {
@@ -36,12 +47,7 @@ export class ActivityService {
   }
 
   async update(data: UpdateActivityRequest) {
-    await firstValueFrom(
-      this.activityService.send(
-        CONSTANTS.KAFKA_TOPICS.ACTIVITY.FIND_ONE,
-        data.id,
-      ),
-    );
+    await firstValueFrom(this.activityGrpcService.findById({ id: data.id }));
 
     this.activityService.emit(
       CONSTANTS.KAFKA_TOPICS.ACTIVITY.UPDATE,
@@ -52,9 +58,7 @@ export class ActivityService {
   }
 
   async remove(id: string) {
-    await firstValueFrom(
-      this.activityService.send(CONSTANTS.KAFKA_TOPICS.ACTIVITY.FIND_ONE, id),
-    );
+    await firstValueFrom(this.activityGrpcService.findById({ id }));
 
     this.activityService.emit(CONSTANTS.KAFKA_TOPICS.ACTIVITY.REMOVE, id);
 

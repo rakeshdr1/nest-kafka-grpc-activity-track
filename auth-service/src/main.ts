@@ -31,6 +31,6 @@ async function bootstrap() {
   app.useGlobalFilters(new ExceptionFilter());
 
   await app.startAllMicroservices();
-  await micro1.listenAsync();
+  await micro1.listen();
 }
 bootstrap();

@@ -3,9 +3,9 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { CreateActivityRequest } from '@shared/dto/activity/create-activity.dto';
-import { UpdateActivityRequest } from '@shared/dto/activity/update-activity.dto';
-import { Activity } from '@shared/schemas/activity.schema';
+import { CreateActivityRequest } from 'src/shared/dto/activity/create-activity.dto';
+import { UpdateActivityRequest } from 'src/shared/dto/activity/update-activity.dto';
+import { Activity } from 'src/shared/schemas/activity.schema';
 
 @Injectable()
 export class ActivityService {
@@ -20,7 +20,7 @@ export class ActivityService {
 
   async findAllByUser(userId) {
     const activities = await this.activityModel.find({ user: userId });
-    return activities;
+    return { activities };
   }
 
   async findById(id: string) {

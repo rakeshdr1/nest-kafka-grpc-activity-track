@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
-import { ExceptionFilter } from '@shared/filters/exception.filters';
+import { ExceptionFilter } from 'src/shared/filters/exception.filters';
 import { AppModule } from './app.module';
 
 async function bootstrap() {

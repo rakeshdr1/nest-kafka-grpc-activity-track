@@ -1,10 +1,10 @@
 import { Controller } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, GrpcMethod, Payload } from '@nestjs/microservices';
 
-import { CONSTANTS } from '@shared/constants';
-import { CreateActivityRequest } from '@shared/dto/activity/create-activity.dto';
-import { UpdateActivityRequest } from '@shared/dto/activity/update-activity.dto';
-import { ParseMessagePipe } from '@shared/pipes/parse-message.pipe';
+import { CONSTANTS } from 'src/shared/constants';
+import { CreateActivityRequest } from 'src/shared/dto/activity/create-activity.dto';
+import { UpdateActivityRequest } from 'src/shared/dto/activity/update-activity.dto';
+import { ParseMessagePipe } from 'src/shared/pipes/parse-message.pipe';
 import { ActivityService } from './activity.service';
 
 @Controller('activity')
@@ -16,14 +16,14 @@ export class ActivityController {
     this.activityService.create(data);
   }
 
-  @MessagePattern(CONSTANTS.KAFKA_TOPICS.ACTIVITY.FIND_ALL)
-  async findAllByUser(@Payload(new ParseMessagePipe()) userId: string) {
-    return this.activityService.findAllByUser(userId);
+  @GrpcMethod('ActivityController', 'findAllByUser')
+  async findAllByUser(userIdData) {
+    return this.activityService.findAllByUser(userIdData.id);
   }
 
-  @MessagePattern(CONSTANTS.KAFKA_TOPICS.ACTIVITY.FIND_ONE)
-  async findById(@Payload(new ParseMessagePipe()) id: string) {
-    return this.activityService.findById(id);
+  @GrpcMethod('ActivityController', 'findById')
+  async findById(idData) {
+    return this.activityService.findById(idData.id);
   }
 
   @EventPattern(CONSTANTS.KAFKA_TOPICS.ACTIVITY.UPDATE)

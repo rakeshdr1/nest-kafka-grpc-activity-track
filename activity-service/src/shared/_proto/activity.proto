@@ -1,0 +1,34 @@
+syntax="proto3";
+
+package activity;
+
+
+service ActivityController {
+    rpc findAllByUser (UserId) returns (ListActivity);
+    rpc findById (ActivityId) returns (Activity);
+
+}
+
+message UserId{
+    string id=1;
+}
+
+message ActivityId{
+    string id=1;
+}
+
+message Activity{
+    string _id=1;
+    string user=2;
+    string name=3;
+    string startDate=4;
+    string endDate=5;
+    string updatedAt = 6;
+    string createdAt = 7;
+}
+
+message ListActivity{
+    repeated Activity activities = 1;
+}
+
+
