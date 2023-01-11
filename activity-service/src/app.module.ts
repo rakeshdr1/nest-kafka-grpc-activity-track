@@ -7,9 +7,7 @@ import { ActivityModule } from './modules/activity/activity.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: path.resolve(process.cwd(), 'apps/activity-service/.env'),
-    }),
+    ConfigModule.forRoot({}),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

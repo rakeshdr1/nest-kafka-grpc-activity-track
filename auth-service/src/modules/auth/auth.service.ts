@@ -63,14 +63,6 @@ export class AuthService {
     return user;
   }
 
-  async updateAccessToken(refreshToken: string): Promise<string> {
-    const userId = this.verifyRefreshToken(refreshToken);
-
-    const tokens = this.generateTokens(userId);
-
-    return tokens.accessToken;
-  }
-
   async verifyAccessToken(accessToken: string) {
     try {
       const payload = this.jwtService.verify(accessToken, {
@@ -81,18 +73,10 @@ export class AuthService {
       if (!userExists) {
         throw new RpcException('User does not exist');
       }
-      return payload.id;
+      return { id: payload.id };
     } catch (err) {
       throw new RpcException(err.message);
     }
-  }
-
-  private verifyRefreshToken(refreshToken: string): string {
-    const payload = this.jwtService.verify(refreshToken, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
-    });
-
-    return payload.id;
   }
 
   private generateTokens(id: string): TokensResponse {

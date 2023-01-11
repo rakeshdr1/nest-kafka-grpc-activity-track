@@ -2,14 +2,42 @@ syntax="proto3";
 
 package auth;
 
-service AppController {
-    rpc Accumulate (NumberArray) returns (SumOfNumberArray);
+service AuthController {
+    rpc create (CreateUserDto) returns (LoginResponse);
+    rpc signIn (LoginUserDto) returns (LoginResponse);
+    rpc verifyToken (Token) returns (UserId);
 }
 
-message NumberArray {
-    repeated double data=1;
+
+message CreateUserDto{
+    string email=1;
+    string name=2;
+    string password=3;
 }
 
-message SumOfNumberArray {
-    double sum=1;
+message LoginUserDto{
+    string email=1;
+    string password=3;
 }
+
+
+message LoginResponse{
+    string access_token=1;
+    string refresh_token=2;
+}
+
+
+message LoginUsetDto{
+    string email=1;
+    string password=2;
+}
+
+message Token{
+    string access_token=1;
+}
+
+message UserId{
+    string id=1;
+}
+
+

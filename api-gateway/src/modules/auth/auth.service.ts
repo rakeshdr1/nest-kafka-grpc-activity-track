@@ -1,59 +1,40 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import { Client, ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
-import { CONSTANTS } from 'src/shared/constants';
 import { SignInRequest } from 'src/shared/dto/auth/sign-in.dto';
 import { SignUpRequest } from 'src/shared/dto/auth/sign-up.dto';
 import { TokensResponse } from 'src/shared/dto/auth/token-response.dto';
+import { IGrpcService } from './grpc.interface';
+import { microserviceOptions } from './grpc.options';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @Inject('AUTH-SERVICE') private readonly authService: ClientKafka,
-  ) {}
+  @Client(microserviceOptions)
+  private client: ClientGrpc;
+
+  private authService: IGrpcService;
+
+  onModuleInit() {
+    this.authService = this.client.getService<IGrpcService>('AuthController');
+  }
 
   async signUp(data: SignUpRequest): Promise<TokensResponse> {
-    const tokens = await firstValueFrom(
-      this.authService.send(
-        CONSTANTS.KAFKA_TOPICS.AUTH.SIGN_UP,
-        JSON.stringify(data),
-      ),
-    );
+    const tokens = await firstValueFrom(this.authService.create(data));
 
     return tokens;
   }
 
   async signIn(data: SignInRequest): Promise<TokensResponse> {
-    const tokens = await firstValueFrom(
-      this.authService.send(
-        CONSTANTS.KAFKA_TOPICS.AUTH.SIGN_IN,
-        JSON.stringify(data),
-      ),
-    );
+    const tokens = await firstValueFrom(this.authService.signIn(data));
 
     return tokens;
   }
 
   async verifyToken(accessToken: string): Promise<string> {
-    const id = await firstValueFrom(
-      this.authService.send(
-        CONSTANTS.KAFKA_TOPICS.AUTH.VERIFY_TOKEN,
-        accessToken,
-      ),
+    const data = await firstValueFrom(
+      this.authService.verifyToken({ accessToken }),
     );
-
-    return id;
-  }
-
-  async updateToken(refreshToken: string): Promise<string> {
-    const accessToken = await firstValueFrom(
-      this.authService.send(
-        CONSTANTS.KAFKA_TOPICS.AUTH.UPDATE_TOKEN,
-        refreshToken,
-      ),
-    );
-
-    return accessToken;
+    return data.id;
   }
 }

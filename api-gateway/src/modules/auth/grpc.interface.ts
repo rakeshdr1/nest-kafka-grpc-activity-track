@@ -1,9 +1,15 @@
+import { SignInRequest } from '@shared/dto/auth/sign-in.dto';
+import { SignUpRequest } from '@shared/dto/auth/sign-up.dto';
 import { Observable } from 'rxjs';
 
 export interface IGrpcService {
-  accumulate(numberArray: INumberArray): Observable<any>;
-}
+  verifyToken(token: { accessToken: string }): Observable<any>;
 
-interface INumberArray {
-  data: number[];
+  signIn(
+    data: SignInRequest,
+  ): Observable<{ accessToken: string; refreshToken: string }>;
+
+  create(
+    data: SignUpRequest,
+  ): Observable<{ accessToken: string; refreshToken: string }>;
 }
