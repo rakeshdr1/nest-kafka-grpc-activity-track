@@ -1,16 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ClientKafka, RpcException } from '@nestjs/microservices';
-
+import * as grpc from '@grpc/grpc-js';
 import * as bcrypt from 'bcryptjs';
 
-import { TokensResponse } from 'src/shared/dto/auth/token-response.dto';
+import { TokensResponse } from '@shared/dto/auth/token-response.dto';
+import { User } from '@shared/schemas/user.schema';
+import { SignInRequest } from '@shared/dto/auth/sign-in.dto';
+import { SignUpRequest } from '@shared/dto/auth/sign-up.dto';
+import { CONSTANTS } from '@shared/constants';
+import { ResponseHandlerService } from '@shared/handlers/response-handlers';
+
 import { UserService } from '../user/user.service';
-import { User } from 'src/shared/schemas/user.schema';
-import { SignInRequest } from 'src/shared/dto/auth/sign-in.dto';
-import { SignUpRequest } from 'src/shared/dto/auth/sign-up.dto';
-import { CONSTANTS } from 'src/shared/constants';
+
+const GrpcStatus = grpc.status;
 
 @Injectable()
 export class AuthService {
@@ -20,12 +24,20 @@ export class AuthService {
     private readonly configService: ConfigService,
     @Inject('NOTIFICATION_SERVICE')
     private readonly notificationClient: ClientKafka,
+    private readonly responseHandlerService: ResponseHandlerService,
   ) {}
 
   async signUp(data: SignUpRequest): Promise<TokensResponse> {
     const userData = await this.userService.findOneByEmail(data.email);
 
-    if (userData) throw new RpcException('User already exists');
+    if (userData) {
+      return this.responseHandlerService.response(
+        'User already exists',
+        HttpStatus.CONFLICT,
+        GrpcStatus.ALREADY_EXISTS,
+        null,
+      );
+    }
 
     const hashedPassword = await bcrypt.hash(data.password, 7);
     const user = await this.userService.create({
@@ -53,11 +65,25 @@ export class AuthService {
   async verifyUser(email: string, password: string): Promise<User> {
     const user = await this.userService.findOneByEmail(email);
 
-    if (!user) throw new RpcException('User does not exist');
+    if (!user) {
+      return this.responseHandlerService.response(
+        'User does not exist',
+        HttpStatus.NOT_FOUND,
+        GrpcStatus.NOT_FOUND,
+        null,
+      );
+    }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
 
-    if (!passwordMatch) throw new RpcException('Incorrect password');
+    if (!passwordMatch) {
+      return this.responseHandlerService.response(
+        'Incorrect password',
+        HttpStatus.UNAUTHORIZED,
+        GrpcStatus.UNAUTHENTICATED,
+        null,
+      );
+    }
 
     return user;
   }
@@ -70,13 +96,23 @@ export class AuthService {
 
       const user = await this.userService.findOne(payload.id);
       if (!user) {
-        throw new RpcException('User does not exist');
+        return this.responseHandlerService.response(
+          'User does not exist',
+          HttpStatus.NOT_FOUND,
+          GrpcStatus.NOT_FOUND,
+          null,
+        );
       }
 
       if (
         user.lastLoginTime.getTime() > new Date(payload.loginTime).getTime()
       ) {
-        throw new RpcException('Device Session Expired');
+        return this.responseHandlerService.response(
+          'Device Session Expired',
+          HttpStatus.UNAUTHORIZED,
+          GrpcStatus.UNAUTHENTICATED,
+          null,
+        );
       }
 
       return { id: payload.id };

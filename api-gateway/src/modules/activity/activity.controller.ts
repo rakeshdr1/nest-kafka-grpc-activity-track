@@ -12,9 +12,10 @@ import {
 import { ClientKafka } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { CONSTANTS } from 'src/shared/constants';
-import { CreateActivityRequest } from 'src/shared/dto/activity/create-activity.dto';
-import { UpdateActivityRequest } from 'src/shared/dto/activity/update-activity.dto';
+import { CONSTANTS } from '@shared/constants';
+import { CreateActivityRequest } from '@shared/dto/activity/create-activity.dto';
+import { UpdateActivityRequest } from '@shared/dto/activity/update-activity.dto';
+
 import { User } from '../auth/decorators/user.decorator';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ActivityService } from './activity.service';

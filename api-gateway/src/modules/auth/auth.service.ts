@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
-import { SignInRequest } from 'src/shared/dto/auth/sign-in.dto';
-import { SignUpRequest } from 'src/shared/dto/auth/sign-up.dto';
-import { TokensResponse } from 'src/shared/dto/auth/token-response.dto';
+import { SignInRequest } from '@shared/dto/auth/sign-in.dto';
+import { SignUpRequest } from '@shared/dto/auth/sign-up.dto';
+import { TokensResponse } from '@shared/dto/auth/token-response.dto';
 import { IGrpcService } from './grpc.interface';
 
 @Injectable()

@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { SignInRequest } from 'src/shared/dto/auth/sign-in.dto';
-import { SignUpRequest } from 'src/shared/dto/auth/sign-up.dto';
-import HttpOkResponse from 'src/shared/http/ok-response';
+import { SignInRequest } from '@shared/dto/auth/sign-in.dto';
+import { SignUpRequest } from '@shared/dto/auth/sign-up.dto';
+import HttpOkResponse from '@shared/http/ok-response';
 
 import { AuthService } from './auth.service';
 
