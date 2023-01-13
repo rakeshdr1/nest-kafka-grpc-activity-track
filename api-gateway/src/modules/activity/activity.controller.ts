@@ -24,7 +24,7 @@ import { ActivityService } from './activity.service';
 @ApiBearerAuth()
 export class ActivityController {
   constructor(
-    @Inject('Activity-SERVICE') private readonly activityClient: ClientKafka,
+    @Inject('ACTIVITY_SERVICE') private readonly activityClient: ClientKafka,
     private readonly activityService: ActivityService,
   ) {}
 

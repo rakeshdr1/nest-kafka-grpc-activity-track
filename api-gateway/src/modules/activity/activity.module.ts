@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 
 import { AuthModule } from '../auth/auth.module';
 import { ActivityController } from './activity.controller';
@@ -9,7 +10,16 @@ import { ActivityService } from './activity.service';
   imports: [
     ClientsModule.register([
       {
-        name: 'Activity-SERVICE',
+        name: 'ACTIVITY_GRPC_SERVICE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'activity',
+          url: `localhost:5006`,
+          protoPath: join(__dirname, '../../shared/_proto/activity.proto'),
+        },
+      },
+      {
+        name: 'ACTIVITY_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {

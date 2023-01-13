@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 
 import { ExceptionFilter } from 'src/shared/filters/exception.filters';
-import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -10,7 +10,7 @@ async function bootstrap() {
   const micro1 = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.GRPC,
     options: {
-      url: `localhost:5000`,
+      url: `localhost:5006`,
       package: 'activity',
       protoPath: join(__dirname, './shared/_proto/activity.proto'),
     },

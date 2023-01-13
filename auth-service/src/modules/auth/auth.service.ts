@@ -38,15 +38,14 @@ export class AuthService {
       JSON.stringify(data),
     );
 
-    const tokens = this.generateTokens(user.id);
-
+    const tokens = await this.generateTokens(user);
     return tokens;
   }
 
   async signIn(data: SignInRequest): Promise<TokensResponse> {
     const user = await this.verifyUser(data.email, data.password);
 
-    const tokens = this.generateTokens(user._id);
+    const tokens = await this.generateTokens(user);
 
     return tokens;
   }
@@ -69,18 +68,27 @@ export class AuthService {
         secret: this.configService.get('JWT_ACCESS_SECRET'),
       });
 
-      const userExists = await this.userService.findOne(payload.id);
-      if (!userExists) {
+      const user = await this.userService.findOne(payload.id);
+      if (!user) {
         throw new RpcException('User does not exist');
       }
+
+      if (
+        user.lastLoginTime.getTime() > new Date(payload.loginTime).getTime()
+      ) {
+        throw new RpcException('Device Session Expired');
+      }
+
       return { id: payload.id };
     } catch (err) {
       throw new RpcException(err.message);
     }
   }
 
-  private generateTokens(id: string): TokensResponse {
-    const payload = { id };
+  private async generateTokens(user: User): Promise<TokensResponse> {
+    const { _id } = user;
+    const loginTime = new Date();
+    const payload = { id: _id, loginTime };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
@@ -92,6 +100,8 @@ export class AuthService {
     });
 
     const tokens = { accessToken, refreshToken };
+    user.lastLoginTime = loginTime;
+    await user.save();
 
     return tokens;
   }
