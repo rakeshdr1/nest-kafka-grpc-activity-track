@@ -14,14 +14,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (!(exception instanceof HttpException)) {
       if (exception.details) {
-        const formattedError = JSON.parse(exception.details);
-        return response.json({
-          status: 'error',
-          message: formattedError.error,
-          statusCode: formattedError.statusCode,
-        });
+        try {
+          const formattedError = JSON.parse(exception.details);
+          return response.json({
+            status: 'error',
+            message: formattedError.error,
+            statusCode: formattedError.statusCode,
+          });
+        } catch (err) {
+          response.json({ status: 'error', message: exception.details });
+        }
       }
     }
+
 
     response.json(exception.response);
   }
